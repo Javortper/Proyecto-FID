@@ -3,26 +3,34 @@ title: "code"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+#PREPROCESSING
+
+## Data reading
+
+```{r}
+data <- read.csv('train.csv')
+invalid_cols = c(1, 2) #TODO: ELEGIR COLUMNAS QUE NO USAREMOS
+data <- data[, -invalid_cols]
+colnames(data)[ncol(data)] <- "Satisfaction"
+head(data)
 ```
 
-## R Markdown
+## Transforming to categorical variables
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```{r}
+data$Gender <- as.numeric(factor(data$Gender, levels = c('Male','Female')))
+data$Customer.Type <- as.numeric(factor(data$Customer.Type, levels = c('Loyal Customer','disloyal Customer')))
+data$Type.of.Travel <- as.numeric(factor(data$Type.of.Travel, levels = c('Business travel','Personal Travel')))
+data$Class <- as.numeric(factor(data$Class, levels = c('Business', 'Eco', 'Eco Plus')))
+data$Satisfaction <- as.numeric(factor(data$Satisfaction, levels = c('satisfied', 'neutral or dissatisfied')))
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+#Ages  category:value -> 1:0-12, 2:13-30, 3:31-60, 4:61-inf
+data$Age[data$Age<=12] <- 1
+data$Age[data$Age>12 && data$Age<=30] <- 2 
+data$Age[data$Age>30 && data$Age<=60] <- 3 
+data$Age[data$Age>60] <- 4 
 
-```{r cars}
-summary(cars)
+
+
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
