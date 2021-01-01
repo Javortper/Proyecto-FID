@@ -19,9 +19,9 @@ head(data)
 
 ```{r}
 #data$Gender <- as.numeric(factor(data$Gender, levels = c('Male','Female')))
-data$Customer.Type <- as.numeric(factor(data$Customer.Type, levels = c('Loyal Customer','disloyal Customer')))
-data$Type.of.Travel <- as.numeric(factor(data$Type.of.Travel, levels = c('Business travel','Personal Travel')))
-data$Class <- as.numeric(factor(data$Class, levels = c('Business', 'Eco', 'Eco Plus')))
+#data$Customer.Type <- as.numeric(factor(data$Customer.Type, levels = c('Loyal Customer','disloyal Customer')))
+#data$Type.of.Travel <- as.numeric(factor(data$Type.of.Travel, levels = c('Business travel','Personal Travel')))
+#data$Class <- as.numeric(factor(data$Class, levels = c('Business', 'Eco', 'Eco Plus')))
 #data$Satisfaction <- as.numeric(factor(data$Satisfaction, levels = c('satisfied', 'neutral or dissatisfied')))
 
 #Ages  category:value -> 1:0-12, 2:13-30, 3:31-60, 4:61-inf
@@ -57,35 +57,36 @@ barplot(n_sat, main="Satisfaction balance")
 #Gender balance
 n_gen <- table(data$Gender)
 barplot(n_gen, main="Gender balance")
+
 #0-12, 2:13-30, 3:31-60, 4:61
-
 #Age balance
-n_age <- table(data$Age)
-barplot(n_age, main="Age count", names.arg = c('0-12', '13-30', '31-60', '60+'))
-
+#n_age <- table(data$Age)
+#barplot(n_age, main="Age count", names.arg = c('0-12', '13-30', '31-60', '60+'))
 
 #Satisfaction comparatives by variable
 
 #TODO: IMPORTANTE PONER EN LA MISMA ESCALA LAS TABLAS COMPARATIVAS
-
 #Satisfaction per gender
 satisfaction_gender <- table(data$Satisfaction, data$Gender)
+satisfaction_gender
+
+
 par(mfrow=c(1,2))
-barplot(satisfaction_gender[,1], main = 'Female', names.arg = c('Dissatisfied', 'Satisfied'))
-barplot(satisfaction_gender[,2], main= 'Male', names.arg = c('Dissatisfied', 'Satisfied'))
+barplot(satisfaction_gender[,1], main = 'Female')
+barplot(satisfaction_gender[,2], main= 'Male')
 
 #Satisfaction per customer type
-satisfaction_customer <- table(data$Satisfaction, data$Customer.Type)
-par(mfrow=c(1,2))
-barplot(satisfaction_customer[,1], main = 'Loyal Customer', names.arg = c('Dissatisfied', 'Satisfied'))
-barplot(satisfaction_customer[,2], main= 'Disloyal Customer', names.arg = c('Dissatisfied', 'Satisfied'))
+#satisfaction_customer <- table(data$Satisfaction, data$Customer.Type)
+#par(mfrow=c(1,2))
+#barplot(satisfaction_customer[,1], main = 'Loyal Customer', names.arg = c('Dissatisfied', 'Satisfied'))
+#barplot(satisfaction_customer[,2], main= 'Disloyal Customer', names.arg = c('Dissatisfied', 'Satisfied'))
 
 #Satisfaction per class type
-satisfaction_class <- table(data$Satisfaction, data$Class)
-par(mfrow=c(1,3))
-barplot(satisfaction_class[,1], main = 'Business', names.arg = c('Dissatisfied', 'Satisfied'), ytics = c(0, 1000, 1500, 5100))
-barplot(satisfaction_class[,2], main= 'Eco', names.arg = c('Dissatisfied', 'Satisfied'))
-barplot(satisfaction_class[,3], main= 'Eco plus', names.arg = c('Dissatisfied', 'Satisfied'))
+#satisfaction_class <- table(data$Satisfaction, data$Class)
+#par(mfrow=c(1,3))
+#barplot(satisfaction_class[,1], main = 'Business', names.arg = c('Dissatisfied', 'Satisfied'), ytics = c(0, 1000, 1500, 5100))
+#barplot(satisfaction_class[,2], main= 'Eco', names.arg = c('Dissatisfied', 'Satisfied'))
+#barplot(satisfaction_class[,3], main= 'Eco plus', names.arg = c('Dissatisfied', 'Satisfied'))
 
 ```
 
