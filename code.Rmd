@@ -45,6 +45,7 @@ print(na_count[na_count>0])
 #Balance check
 
 #Satisfaction balance
+library(ggplot2)
 sat_bal <- ggplot(data = data, aes(x=Satisfaction, fill=Satisfaction)) + 
   geom_bar() + 
   labs(x="Satisfaction balance") +
@@ -126,7 +127,7 @@ data$Satisfaction <- as.numeric(factor(data$Satisfaction, levels = c('satisfied'
 ##Correlation Matrix
 ```{r}
 #IMPORTANTE install.packages("reshape")
-#
+library(reshape)
 cormat <- round(cor(data),2)
 melted_cormat <- melt(cormat)
 melted_cormat <- melt(cormat)
@@ -138,8 +139,51 @@ ggplot(data = melted_cormat, aes(x=X1, y=X2, fill=value)) +
 
 ```
 
+#TÉNICAS DE CLASIFICACIÓN
+```{r}
+head(data)
+```
+
+##TÉCNICAS VISTAS EN CLASE:
+```{r}
+library(caret)
+library(lattice)
+library(ggplot2)
+```
+#Cross-validation
+```{r}
+data_train <- read.csv('train.csv')
+data_test <- read.csv('test.csv')
+data_total <- rbind(data_train,data_test, deparse.level=1)
+```
 
 
+```{r}
+myControl_clas <- trainControl(
+  method = "cv",
+  number = 10,
+  summaryFunction = twoClassSummary,
+  classProbs = TRUE, # IMPORTANT!
+  savePredictions = TRUE,
+  verbose = FALSE
+)
+```
+#REGRESIÓN LOGÍSTICA
+```{r}
+unique(data["Satisfaction"])
+
+
+data[, "pred"]
+```
+
+
+
+```{r}
+model_clas_glm <- train(Satisfaction~ .,data,
+                        method="glm",
+                        na.action = na.pass,  #incluyendo esto, elimina el primer error en el que dice que faltan objectos
+                        trControl=myControl_clas)
+```
 
 
 
