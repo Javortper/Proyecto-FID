@@ -123,6 +123,7 @@ data$Satisfaction <- as.numeric(factor(data$Satisfaction, levels = c('satisfied'
 
 ```
 
+
 ##Correlation Matrix
 ```{r}
 #IMPORTANTE install.packages("reshape")
