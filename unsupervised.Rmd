@@ -1,0 +1,127 @@
+---
+title: "Unsupervised"
+output: html_notebook
+---
+
+# Libraries
+```{r}
+#install.packages("NbClust")
+#install.packages("cluster")
+#install.packages("factoextra")
+#install.packages("ggrepel")
+#install.packages("tidyverse")
+library(tidyverse)
+library(factoextra)
+library(cluster)
+library(NbClust)
+library(ggplot2)
+```
+
+#  PREPROCESSING
+
+#  Data reading
+
+```{r}
+data <- read.csv('train.csv')
+invalid_cols = c(1, 2)
+data <- data[, -invalid_cols]
+colnames(data)[ncol(data)] <- "Satisfaction"
+head(data)
+```
+# Transforming to categorical variables
+
+# Ages category:value -> 1:0-12, 2:13-30, 3:31-60, 4:61-inf
+```{r}
+data$Age[data$Age<=12] <- 1
+data$Age[data$Age>12 & data$Age<=30] <- 2 
+data$Age[data$Age>30 & data$Age<=60] <- 3 
+data$Age[data$Age>60] <- 4
+# Missing values and outliers
+#na_count <-sapply(data, function(y) sum(length(which(is.na(y)))))
+#print(na_count[na_count>0])
+data$Gender <- as.numeric(factor(data$Gender, levels = c('Male','Female')))
+data$Customer.Type <- as.numeric(factor(data$Customer.Type, levels = c('Loyal Customer','disloyal Customer')))
+data$Type.of.Travel <- as.numeric(factor(data$Type.of.Travel, levels = c('Business travel','Personal Travel')))
+data$Class <- as.numeric(factor(data$Class, levels = c('Business', 'Eco', 'Eco Plus')))
+data$Satisfaction <- as.numeric(factor(data$Satisfaction, levels = c('satisfied', 'neutral or dissatisfied')))
+```
+
+# Eliminamos variable de clasificacion
+```{r}
+data$Satisfaction <- NULL
+head(data)
+```
+
+```{r}
+# data without NA
+new_data <- na.omit(data)
+# Tomamos un sample de 5000 por varios motivos:
+# Sin sample se excede la memoria vectorial y esto ocurre hasta al menos 30000 filas.
+# Por debajo de 30000 filas el sample se crea, pero falla el Nbclust a la hora de calcular el número de clusters óptimo 
+# indicando que el algoritmo no converge tras 10 intentos. Usando 15000 parece que no ocurre ninguno de estos dos errores,
+# pero tras más de 45 minutos de ejecución, no termina de calcular, lo cual parece excesivo. Por lo que se ha usado 1000
+sample_data <- sample_n(new_data, 1000)
+##Escalado/estandarizado de los datos 
+sample_stand <- scale(sample_data)  # To standarize the variables
+head(sample_stand)
+```
+
+# TÉCNICAS K MÁS ÓPTIMA
+
+# NbClust kmeans
+```{r}
+nc <- NbClust(sample_stand, min.nc=2, max.nc=15, method="kmeans")
+```
+# NbClust ELBOW
+
+# VISUALIZACION ELBOW
+
+```{r}
+jpeg('kmeans_elbow.jpeg')
+fviz_nbclust(sample_stand, kmeans,method = c("wss"))+geom_vline(xintercept = 2, linetype = 2)
+#dev.off()
+```
+
+# NbClust SILHOUETTE
+```{r}
+nc_silhouette<- NbClust(sample_stand, min.nc=2, max.nc=15, method="kmeans", index="silhouette")
+nc_silhouette
+```
+
+# VISUALIZACION DE LOS CLUSTERING SEGUN EL K DE CADA METODO
+
+# EL RESULTADO TRAS APLICAR SILHOUETE ES K=2
+
+# Aplicamos Kmeans 2 CLUSTERS
+
+# SIN ESCALADO
+```{r}
+k_means_no_scaled <- kmeans(sample_data, 2)
+k_means_no_scaled
+``` 
+
+# ESCALADO
+
+```{r}
+k_means_scaled <- kmeans(sample_stand, 2)
+
+k_means_scaled
+```
+
+# VISUALIZACIÓN
+
+# SIN ESCALADO
+```{r}
+jpeg('kmeans2_sinescalado.jpeg')
+fviz_cluster(k_means_no_scaled, data = sample_data, ellipse.type =  "convex",main="Cluster k=2 sin escalado")+
+  theme_minimal()
+dev.off()
+```
+
+# ESCALADO
+```{r}
+jpeg('kmeans2_escalado.jpeg')
+fviz_cluster(k_means_scaled, data = sample_stand, ellipse.type =  "convex",main="Cluster k=2 escalado")+
+  theme_minimal()
+dev.off()
+```
