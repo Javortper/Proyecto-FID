@@ -41,83 +41,6 @@ print(na_count[na_count>0])
 
 #TODO: buscar outliers ¿que métodos hay?
 ```
-
-## Data visualization
-
-
-```{r}
-#Balance check
-
-#Satisfaction balance
-library(ggplot2)
-sat_bal <- ggplot(data = data, aes(x=Satisfaction, fill=Satisfaction)) + 
-  geom_bar() + 
-  labs(x="Satisfaction balance") +
-  theme_minimal()+
-  guides(fill=FALSE)
-sat_bal
-
-#Gender balance
-gen_bal <-ggplot(data = data, aes(x=Gender, fill=Gender)) + 
-  geom_bar() + 
-  labs(x="Gender balance") +
-  theme_minimal()+
-  guides(fill=FALSE)
-gen_bal
-
-#Age balance
-#1:0-12, 2:13-30, 3:31-60, 4:61
-age_bal <-ggplot(data = data, aes(x=Age, fill=Age)) + 
-  geom_bar() + 
-  labs(x="Age") +
-  theme_minimal()
-age_bal
-
-
-##Satisfaction comparatives by variable
-
-#Satisfaction vs gender
-sat_gen <-ggplot(data = data, aes(x=Gender, fill=Satisfaction)) + 
-  geom_bar(position="dodge") + 
-  labs(x="Satisfaction vs gender") +
-  theme_minimal()
-sat_gen
-
-#Satisfaction vs customer type
-sat_customer <- ggplot(data = data, aes(x=Customer.Type, fill=Satisfaction)) + 
-  geom_bar(position="dodge") + 
-  labs(x="Satisfaction vs customer type") +
-  theme_minimal()+
-  guides()
-sat_customer
-
-
-#Satisfaction vs type of travel
-sat_traveltype <- ggplot(data = data, aes(x=Type.of.Travel, fill=Satisfaction)) + 
-  geom_bar(position="dodge") + 
-  labs(x="Satisfaction vs type of travel") +
-  theme_minimal()+
-  guides()
-sat_traveltype
-
-#Satisfaction vs Class
-sat_traveltype <- ggplot(data = data, aes(x=Class, fill=Satisfaction)) + 
-  geom_bar(position="dodge") + 
-  labs(x="Satisfaction vs Class") +
-  theme_minimal()+
-  guides()
-sat_traveltype
-
-#Satisfaction vs Age
-sat_traveltype <- ggplot(data = data, aes(x=Age, fill=Satisfaction)) + 
-  geom_bar(position="dodge") + 
-  labs(x="Satisfaction vs age") +
-  theme_minimal()+
-  guides()
-sat_traveltype
-```
-
-
 ##Transforming to categorical variables
 ```{r}
 data$Gender <- as.numeric(factor(data$Gender, levels = c('Male','Female')))
@@ -128,7 +51,6 @@ data$Satisfaction <- factor(data$Satisfaction, levels = c('satisfied', 'dissatis
 unique(data["Satisfaction"])
 str(data['Satisfaction'])
 ```
-
 
 ##Correlation Matrix
 ```{r}
@@ -143,9 +65,9 @@ ggplot(data = melted_cormat, aes(x=X1, y=X2, fill=value)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 1, size = 12, hjust = 1))
   coord_fixed()
 
-```
 
-#TÉNICAS DE CLASIFICACIÓN
+
+##TÉCNICAS DE CLASIFICACIÓN
 ```{r}
 head(data["Satisfaction"])
 ```
