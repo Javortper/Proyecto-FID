@@ -11,21 +11,22 @@ Pero ¿Qué son los métodos Ensemble?
 
 # Ensemble Methods
 
-Son algoritmos de aprendizaje supervisado creados a partir de la combinación de un conjunto finito de algoritmos de aprendizaje y cuyo objetivo es mejorar los resultados que pueden tener cada uno de los "subalgoritmos" por separado. Este objetivo lleva a que en la literatura se designe a esos "subalgoritmos" como Weak-classifier y al Ensemble, el algoritmo final resultante, Strong-classifier
+Son algoritmos de aprendizaje supervisado creados a partir de la combinación de un conjunto finito de algoritmos de aprendizaje y cuyo objetivo es mejorar los resultados que pueden tener cada uno de los "subalgoritmos" por separado. Este objetivo lleva a que en la literatura se designe a esos "subalgoritmos" como Weak-classifier y al Ensemble, el algoritmo final resultante, Strong-classifier.
 
 Los métodos Ensemble se consideran habitualmente algoritmos muy versátiles, ya que la variedad de los 'subalgoritmos' que los componen les permiten enfrentarse con solvencia a Datasets igual de variados.
 
-<i>Wisdom of a crowd</i> --> <i>wisdom of a crowd of experts</i>. 
+<i>Wisdom of a crowd</i> / <i>wisdom of a crowd of experts</i>. 
 
 - Pregunta 1: Entrenamiento ¿Con qué datos entrenamos cada uno de los weak-learners? 
-- Pregunta 2: Si cada uno de los weak-classifiers da un resultado... ¿Con cúal nos quedamos?
+- Pregunta 2: Predicciones. Si cada uno de los weak-classifiers da un resultado... ¿Con cúal nos quedamos?
 
-Existen varios tipos de ensemble pero, para las técnicas que vamos a abordar, nos interesan dos concretamente:
+Existen más tipos de ensemble pero, para las técnicas que vamos a abordar, nos interesan dos concretamente:
 
 ## Bagging (Boostrap-Agreggating): 
 1. Entrenamiento paralelo: Entrenamos cada uno de los weak-classifiers con unos datos distintos.
-Estos datos serán un subconjunto, escogido de forma aleatoria y con reemplazo, del conjunto total de datos de entrenamiento. (Boostrapping the data)
-2. A la hora de realizar las predicciones, se evalúan los resultados de cada uno de los weak-classifiers y se lleva a cabo una media (en el caso de que sea regresión) o una votación (en el caso de la clasificación).
+Estos datos serán un subconjunto, escogido de forma aleatoria y con reemplazo, del conjunto total de datos de entrenamiento. A este procedimiento la literatura se refiere como 'Bootstraping the data'.
+
+2. Predicciones: A la hora de realizar las predicciones, se evalúan los resultados de cada uno de los weak-classifiers y se lleva a cabo una media (en el caso de que sea regresión) o una votación (en el caso de la clasificación).
 <center>
 ![Bootstrapping Aggregating Schema](C:/Users/josee/Desktop/FID/Proyecto/codigo/imagenes/bootstrapping_aggregating.png){ width=70% height=70%}
 
@@ -35,8 +36,9 @@ Estos datos serán un subconjunto, escogido de forma aleatoria y con reemplazo, 
 
 ## Boosting:
 
-1. Entrenamiento secuencial: Entrenamos cada uno de los weak-classifiers con subconjuntos diferentes, pero dependientes unos de otros. Es decir, si tenemos tres weak-classifiers, entrenaremos el segundo con aquellos datos que hayan tenido peor resultado en el primero y entrenaremos el tercero con aquellos que hayan tenido peores resultados en el segundo. Dicha selección se hace añadiendole una ponderación de pesos a cada instancia del dataset (ver clase del Dr. Patrick Winston) 
-2. Por otra parte, también se hará uso de una segunda batería de pesos, dependiente de la primera, para determinar el resultado final de la predicción del ensemble, que será una media ponderada (en el caso de la regresión) o un voto con pesos (en el caso de la clasificación).
+1. Entrenamiento secuencial: Entrenamos cada uno de los weak-classifiers con subconjuntos diferentes, pero dependientes unos de otros. Es decir, si tenemos tres weak-classifiers, entrenaremos el segundo con aquellos datos que hayan tenido peor resultado en el primero y entrenaremos el tercero con aquellos que hayan tenido peores resultados en el segundo. Dicha selección se hace añadiendole una ponderación de pesos a cada instancia del dataset (ver clase del Dr. Patrick Winston).
+
+2. Predicciones ponderadas: Por otra parte, también se hará uso de una segunda batería de pesos, dependiente de la primera, para determinar el resultado final de la predicción del ensemble, que será una media ponderada (en el caso de la regresión) o un voto con pesos (en el caso de la clasificación).
 
   Ejemplo: AdaBoost(2003 Gödel Prize)
   
@@ -60,9 +62,25 @@ Combinan la idea de los métodos boosting, que acabamos de explicar, con el algo
 
 ¿En qué consiste el algoritmo gradient descent? ¿Cómo se combinan ambas ideas?
 
+<center>
+![Gradient Descent](C:/Users/josee/Desktop/FID/Proyecto/codigo/imagenes/gradient_descent.jpeg){ width=70% height=70%}
+
+
+
+
+
+<i>By Agnes Sauer - Morioh <https://morioh.com/p/15c995420be6> </i>
+</center>\
 
 
 ## Bibliografía
+
+Notebooks:
+
+
+
+
+Teoría de modelos:
 
 <http://primo.ai/index.php?title=Multiclassifiers;_Ensembles_and_Hybrids;_Bagging,_Boosting,_and_Stacking>\
 
@@ -77,6 +95,8 @@ Curso de Udacity. Machine Learning for Trading by Georgia Tech\
 
 <https://en.wikipedia.org/wiki/Gradient_boosting#:~:text=Gradient%20boosting%20is%20a%20machine,prediction%20models%2C%20typically%20decision%20trees.>\
 
-Statquest con Josh Starmer
+StatQuest with Josh Starmer:\
+<https://www.youtube.com/watch?v=3CC4N4z3GJc&ab_channel=StatQuestwithJoshStarmer>/
+<>/
 
 
