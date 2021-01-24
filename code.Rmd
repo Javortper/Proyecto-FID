@@ -52,6 +52,20 @@ unique(data["Satisfaction"])
 str(data['Satisfaction'])
 ```
 
+##Correlation Matrix
+```{r}
+#IMPORTANTE install.packages("reshape")
+library(reshape)
+cormat <- round(cor(data),2)
+melted_cormat <- melt(cormat)
+melted_cormat <- melt(cormat)
+ggplot(data = melted_cormat, aes(x=X1, y=X2, fill=value)) + 
+  geom_tile() +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, size = 12, hjust = 1))
+  coord_fixed()
+
+
 
 ##TÉCNICAS DE CLASIFICACIÓN
 ```{r}
