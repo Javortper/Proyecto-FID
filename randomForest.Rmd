@@ -1,0 +1,144 @@
+```{r}
+library(caret)
+```
+## Data reading
+```{r}
+data <- read.csv('train.csv')
+invalid_cols = c(1, 2, 24) # Drop column Arrival.Delay.in.Minutes (contains misses values)
+data <- data[, -invalid_cols]
+colnames(data)[ncol(data)] <- "Satisfaction"
+```
+
+
+```{r}
+data$Gender <- factor(data$Gender)
+data$Type.of.Travel <- factor(data$Type.of.Travel)
+data$Customer.Type <- factor(data$Customer.Type)
+#data$Customer.Type <- factor(data$Class)
+#data$Class <- as.numeric(factor(data$Class, levels = c('Business', 'Eco', 'Eco Plus')))
+make.names(c("satisfied", "neutral or dissatisfied"), unique=TRUE)
+data$Satisfaction[data$Satisfaction=='neutral or dissatisfied'] <- 'dissatisfied'
+data$Satisfaction <- factor(data$Satisfaction)
+str(data)
+```
+```{r}
+
+# Data Partition
+# 70% train, 30% test
+
+ind <- sample(2, nrow(data), replace = TRUE, prob = c(0.7, 0.3))
+
+train <- data[ind==1,]
+test <- data[ind==2,]
+
+
+
+
+tr_control <- trainControl(method='cv',
+                           number=5,
+                           classProbs = TRUE,
+                           verboseIter = TRUE,)
+
+set.seed(1)
+model <- train(Satisfaction ~ ., train,
+               method='rf', TuneLength=3,
+               trControl = tr_control)
+
+print(model)
+```
+```{r}
+# Data Partition
+library(randomForest)
+
+ind <- sample(2, nrow(data), replace = TRUE, prob = c(0.7, 0.3))
+
+train <- data[ind==1,]
+test <- data[ind==2,]
+metric <- "Accuracy"
+
+
+customRF <- list(type = "Classification",
+                 library = "randomForest",
+                 loop = NULL)
+
+customRF$parameters <- data.frame(parameter = c("mtry", "ntree"),
+                                  class = rep("numeric", 2),
+                                  label = c("mtry", "ntree"))
+
+customRF$grid <- function(x, y, len = NULL, search = "grid") {}
+
+customRF$fit <- function(x, y, wts, param, lev, last, weights, classProbs) {
+  randomForest(x, y,
+               mtry = param$mtry,
+               ntree=param$ntree)
+}
+
+#Predict label
+customRF$predict <- function(modelFit, newdata, preProc = NULL, submodels = NULL)
+   predict(modelFit, newdata)
+
+#Predict prob
+customRF$prob <- function(modelFit, newdata, preProc = NULL, submodels = NULL)
+   predict(modelFit, newdata, type = "prob")
+
+customRF$sort <- function(x) x[order(x[,1]),]
+customRF$levels <- function(x) x$classes
+
+
+
+
+control <- trainControl(method="repeatedcv", 
+                        number=2,
+                        verboseIter = TRUE,
+                        allowParallel = TRUE)
+
+tunegrid <- expand.grid(.mtry=c(1:15),.ntree=c(30, 60, 90))
+
+set.seed(123)
+
+custom <- train(Satisfaction~., data=train, 
+                method=customRF, 
+                metric=metric, 
+                tuneGrid=tunegrid, 
+                trControl=control)
+
+summary(custom)
+```
+
+
+```{r}
+summary(custom)
+plot(custom)
+```
+
+
+
+```{r}
+## Prediction & Confusion Matrix - test data
+predict_rf_model <- predict(model, test)
+confusionMatrix(predict_rf_model, as.factor(test$Satisfaction))
+```
+```{r}
+library(pROC)
+library(ROCit)
+
+## Warning: package 'ROCit' was built under R version 3.5.2
+ROCit_obj <- rocit(score=as.numeric(predict_rf_model),class=as.numeric(test$Satisfaction))
+plot(ROCit_obj)
+
+myroc <- roc(as.numeric(predict_rf_model), as.numeric(test$Satisfaction))
+auc(myroc)
+
+
+```
+```{r}
+library(ROCit)
+## Warning: package 'ROCit' was built under R version 3.5.2
+ROCit_obj <- rocit(score=as.numeric(predict_rf_model),class=as.numeric(test$Satisfaction))
+plot(ROCit_obj)
+
+
+```
+
+
+
