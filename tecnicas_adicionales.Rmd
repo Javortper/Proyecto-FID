@@ -1,0 +1,82 @@
+---
+title: "Técnicas adicionales: Gradient Boosting & Random Forest"
+output: html_document
+---
+
+A continuación, vamos a proceder con dos técnicas de aprendizaje supervisado adicionales. Antes de implementar el código, vamos a comentar brevemente los aspectos fundamentales y de mayor interés de ambas técnicas.
+
+Lo primero que hay que comentar es que ambos algoritmos son de tipo Ensemble y que se pueden catalogar como Black-box. 
+
+Pero ¿Qué son los métodos Ensemble?
+
+# Ensemble Methods
+
+Son algoritmos de aprendizaje supervisado creados a partir de la combinación de un conjunto finito de algoritmos de aprendizaje y cuyo objetivo es mejorar los resultados que pueden tener cada uno de los "subalgoritmos" por separado. Este objetivo lleva a que en la literatura se designe a esos "subalgoritmos" como Weak-classifier y al Ensemble, el algoritmo final resultante, Strong-classifier
+
+Los métodos Ensemble se consideran habitualmente algoritmos muy versátiles, ya que la variedad de los 'subalgoritmos' que los componen les permiten enfrentarse con solvencia a Datasets igual de variados.
+
+<i>Wisdom of a crowd</i> --> <i>wisdom of a crowd of experts</i>. 
+
+- Pregunta 1: Entrenamiento ¿Con qué datos entrenamos cada uno de los weak-learners? 
+- Pregunta 2: Si cada uno de los weak-classifiers da un resultado... ¿Con cúal nos quedamos?
+
+Existen varios tipos de ensemble pero, para las técnicas que vamos a abordar, nos interesan dos concretamente:
+
+## Bagging (Boostrap-Agreggating): 
+1. Entrenamiento paralelo: Entrenamos cada uno de los weak-classifiers con unos datos distintos.
+Estos datos serán un subconjunto, escogido de forma aleatoria y con reemplazo, del conjunto total de datos de entrenamiento. (Boostrapping the data)
+2. A la hora de realizar las predicciones, se evalúan los resultados de cada uno de los weak-classifiers y se lleva a cabo una media (en el caso de que sea regresión) o una votación (en el caso de la clasificación).
+<center>
+![Bootstrapping Aggregating Schema](C:/Users/josee/Desktop/FID/Proyecto/codigo/imagenes/bootstrapping_aggregating.png){ width=70% height=70%}
+
+<i>By Sirakorn - Own work, CC BY-SA 4.0, <https://commons.wikimedia.org/w/index.php?curid=85888769> </i>
+
+</center>\
+
+## Boosting:
+
+1. Entrenamiento secuencial: Entrenamos cada uno de los weak-classifiers con subconjuntos diferentes, pero dependientes unos de otros. Es decir, si tenemos tres weak-classifiers, entrenaremos el segundo con aquellos datos que hayan tenido peor resultado en el primero y entrenaremos el tercero con aquellos que hayan tenido peores resultados en el segundo. Dicha selección se hace añadiendole una ponderación de pesos a cada instancia del dataset (ver clase del Dr. Patrick Winston) 
+2. Por otra parte, también se hará uso de una segunda batería de pesos, dependiente de la primera, para determinar el resultado final de la predicción del ensemble, que será una media ponderada (en el caso de la regresión) o un voto con pesos (en el caso de la clasificación).
+
+  Ejemplo: AdaBoost(2003 Gödel Prize)
+  
+<center>
+![Boosting Schema](C:/Users/josee/Desktop/FID/Proyecto/codigo/imagenes/boosting.png){ width=70% height=70%}
+
+<i>By Sirakorn - Own work, CC BY-SA 4.0, <https://commons.wikimedia.org/w/index.php?curid=85888769> </i>
+</center>\
+
+## Random Forest
+Es un algoritmo de tipo Bagging.
+
+Combina la simplicidad de los arboles de decisión con la flexibilidad asociada a los métodos ensemble, lo que resulta en un importante aumento de la exactitud del clasificador.
+
+Además de la aleatoriedad a la hora de escoger el dataset, incluimos aleatoriedad a la hora de decidir qué subconjunto de atributos se incluirá en cada uno de los árboles de decisión. El nº de atributos por cada paso del arbol de decisión, será un parámetro a determinar. Lo habitual es probar con varios hasta encontrar el que de mejor resultado.
+
+## Gradient Boosting
+Los algoritmos Gradient Boosting se encuentran últimamente entre los algoritmos más populares.
+
+Combinan la idea de los métodos boosting, que acabamos de explicar, con el algoritmo de optimización gradient descent.
+
+¿En qué consiste el algoritmo gradient descent? ¿Cómo se combinan ambas ideas?
+
+
+
+## Bibliografía
+
+<http://primo.ai/index.php?title=Multiclassifiers;_Ensembles_and_Hybrids;_Bagging,_Boosting,_and_Stacking>\
+
+<https://quantdare.com/what-is-the-difference-between-bagging-and-boosting/>\
+
+Curso Artificial Intelligence MIT OpenCourseWare (Dr. Patrick Winston): 17. Learning Boosting\
+<https://www.youtube.com/watch?v=UHBmv7qCey4&ab_channel=MITOpenCourseWare>
+
+Curso de Udacity. Machine Learning for Trading by Georgia Tech\
+<https://www.youtube.com/watch?v=2Mg8QD0F1dQ&feature=youtu.be&ab_channel=Udacity>\
+<https://www.youtube.com/watch?v=Un9zObFjBH0&feature=youtu.be&ab_channel=Udacity>\
+
+<https://en.wikipedia.org/wiki/Gradient_boosting#:~:text=Gradient%20boosting%20is%20a%20machine,prediction%20models%2C%20typically%20decision%20trees.>\
+
+Statquest con Josh Starmer
+
+
