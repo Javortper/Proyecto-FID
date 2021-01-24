@@ -1,0 +1,122 @@
+---
+title: "Preprocesamiento y Visualizacion"
+output: html_document
+---
+```{r}
+library(ggplot2)
+library(reshape)
+```
+
+
+## Data reading
+```{r}
+data <- read.csv('train.csv')
+invalid_cols = c(1, 2) #TODO: ELEGIR COLUMNAS QUE NO USAREMOS, de momento 1 y 2
+data <- data[, -invalid_cols]
+colnames(data)[ncol(data)] <- "Satisfaction"
+head(data)
+```
+
+## Transforming to categorical variables
+
+```{r}
+#Ages  category:value -> 1:0-12, 2:13-30, 3:31-60, 4:61-inf
+data$Age[data$Age<=12] <- 1
+data$Age[data$Age>12 & data$Age<=30] <- 2 
+data$Age[data$Age>30 & data$Age<=60] <- 3 
+data$Age[data$Age>60] <- 4 
+```
+
+
+## Missing values and outliers
+```{r}
+na_count <-sapply(data, function(y) sum(length(which(is.na(y)))))
+print(na_count[na_count>0])
+#Arrival delay is the unique variable with missing values, specifically 310.   #TODO: ¿BORRAMOS LA VARIABLE?
+#TODO: buscar outliers ¿que métodos hay?
+```
+
+## Data visualization
+```{r}
+#Balance check
+#Satisfaction balance
+sat_bal <- ggplot(data = data, aes(x=Satisfaction, fill=Satisfaction)) + 
+  geom_bar() + 
+  labs(x="Satisfaction balance") +
+  theme_minimal()+
+  guides(fill=FALSE)
+sat_bal
+#Gender balance
+gen_bal <-ggplot(data = data, aes(x=Gender, fill=Gender)) + 
+  geom_bar() + 
+  labs(x="Gender balance") +
+  theme_minimal()+
+  guides(fill=FALSE)
+gen_bal
+#Age balance
+#1:0-12, 2:13-30, 3:31-60, 4:61
+age_bal <-ggplot(data = data, aes(x=Age, fill=Age)) + 
+  geom_bar() + 
+  labs(x="Age") +
+  theme_minimal()
+age_bal
+##Satisfaction comparatives by variable
+#Satisfaction vs gender
+sat_gen <-ggplot(data = data, aes(x=Gender, fill=Satisfaction)) + 
+  geom_bar(position="dodge") + 
+  labs(x="Satisfaction vs gender") +
+  theme_minimal()
+sat_gen
+#Satisfaction vs customer type
+sat_customer <- ggplot(data = data, aes(x=Customer.Type, fill=Satisfaction)) + 
+  geom_bar(position="dodge") + 
+  labs(x="Satisfaction vs customer type") +
+  theme_minimal()+
+  guides()
+sat_customer
+#Satisfaction vs type of travel
+sat_traveltype <- ggplot(data = data, aes(x=Type.of.Travel, fill=Satisfaction)) + 
+  geom_bar(position="dodge") + 
+  labs(x="Satisfaction vs type of travel") +
+  theme_minimal()+
+  guides()
+sat_traveltype
+#Satisfaction vs Class
+sat_traveltype <- ggplot(data = data, aes(x=Class, fill=Satisfaction)) + 
+  geom_bar(position="dodge") + 
+  labs(x="Satisfaction vs Class") +
+  theme_minimal()+
+  guides()
+sat_traveltype
+#Satisfaction vs Age
+sat_traveltype <- ggplot(data = data, aes(x=Age, fill=Satisfaction)) + 
+  geom_bar(position="dodge") + 
+  labs(x="Satisfaction vs age") +
+  theme_minimal()+
+  guides()
+sat_traveltype
+```
+
+
+##Transforming to categorical variables
+```{r}
+data$Gender <- as.numeric(factor(data$Gender, levels = c('Male','Female')))
+data$Customer.Type <- as.numeric(factor(data$Customer.Type, levels = c('Loyal Customer','disloyal Customer')))
+data$Type.of.Travel <- as.numeric(factor(data$Type.of.Travel, levels = c('Business travel','Personal Travel')))
+data$Class <- as.numeric(factor(data$Class, levels = c('Business', 'Eco', 'Eco Plus')))
+data$Satisfaction <- as.numeric(factor(data$Satisfaction, levels = c('satisfied', 'neutral or dissatisfied')))
+```
+
+
+##Correlation Matrix
+```{r}
+#IMPORTANTE install.packages("reshape")
+#
+cormat <- round(cor(data),2)
+melted_cormat <- melt(cormat)
+melted_cormat <- melt(cormat)
+ggplot(data = melted_cormat, aes(x=X1, y=X2, fill=value)) + 
+  geom_tile() +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, size = 12, hjust = 1))
+  coord_fixed()

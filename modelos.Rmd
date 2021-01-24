@@ -1,0 +1,155 @@
+---
+title: "code"
+output: html_document
+---
+
+#PREPROCESSING
+
+## Data reading
+
+```{r}
+data <- read.csv('train.csv')
+invalid_cols = c(1, 2) #TODO: ELEGIR COLUMNAS QUE NO USAREMOS, de momento 1 y 2
+data <- data[, -invalid_cols]
+colnames(data)[ncol(data)] <- "Satisfaction"
+head(data)
+```
+
+## Transforming to categorical variables
+
+```{r}
+#Ages  category:value -> 1:0-12, 2:13-30, 3:31-60, 4:61-inf
+data$Age[data$Age<=12] <- 1
+data$Age[data$Age>12 & data$Age<=30] <- 2 
+data$Age[data$Age>30 & data$Age<=60] <- 3 
+data$Age[data$Age>60] <- 4 
+
+make.names(c("satisfied", "neutral or dissatisfied"), unique=TRUE)
+data$Satisfaction[data$Satisfaction=='neutral or dissatisfied'] <- 'dissatisfied'
+head(data['Satisfaction'])
+
+```
+
+
+## Missing values and outliers
+
+```{r}
+na_count <-sapply(data, function(y) sum(length(which(is.na(y)))))
+print(na_count[na_count>0])
+
+#Arrival delay is the unique variable with missing values, specifically 310.   #TODO: ¿BORRAMOS LA VARIABLE?
+
+#TODO: buscar outliers ¿que métodos hay?
+```
+##Transforming to categorical variables
+```{r}
+data$Gender <- as.numeric(factor(data$Gender, levels = c('Male','Female')))
+data$Customer.Type <- as.numeric(factor(data$Customer.Type, levels = c('Loyal Customer','disloyal Customer')))
+data$Type.of.Travel <- as.numeric(factor(data$Type.of.Travel, levels = c('Business travel','Personal Travel')))
+data$Class <- as.numeric(factor(data$Class, levels = c('Business', 'Eco', 'Eco Plus')))
+data$Satisfaction <- factor(data$Satisfaction, levels = c('satisfied', 'dissatisfied'))
+unique(data["Satisfaction"])
+str(data['Satisfaction'])
+```
+
+
+##TÉCNICAS DE CLASIFICACIÓN
+```{r}
+head(data["Satisfaction"])
+```
+
+##TÉCNICAS VISTAS EN CLASE:
+```{r}
+library(lattice)
+library(ggplot2)
+library(caret)
+library(magrittr)
+```
+#Cross-validation
+```{r}
+data_train <- read.csv('train.csv')
+data_test <- read.csv('test.csv')
+data_total <- rbind(data_train,data_test, deparse.level=1)
+```
+
+
+```{r}
+myControl_clas <- trainControl(
+  method = "cv",
+  number = 10,
+  summaryFunction = twoClassSummary,
+  classProbs = TRUE, # IMPORTANT!
+  savePredictions = TRUE,
+  verbose = FALSE
+)
+```
+#GENERALIZED LINEAR MODEL
+```{r}
+model_clas_glm <- train(Satisfaction~ .,data,
+                        method="glm",
+                        na.action = na.pass,  #incluyendo esto, elimina el primer error en el que dice que faltan objectos
+                        trControl=myControl_clas)
+
+model_clas_glm
+```
+#GLMNET
+```{r}
+#model_class_glmnet <- train(Satisfaction~ .,data,
+#                            method = "glmnet",
+#                            na.action = na.pass,
+#                            trControl = myControl_clas)
+#Error in lognet(x, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : NA/NaN/Inf en llamada a una función externa (arg 5)
+
+```
+
+
+#xbgTree
+```{r}
+model_clas_xgbTree <- train(Satisfaction~ .,data,
+                            method = "xgbTree",
+                            na.action = na.pass,
+                            trControl=myControl_clas)
+
+```
+
+
+```{r}
+results_xgbTree <- model_clas_xgbTree['results']
+which.max(model_clas_xgbTree$results$ROC)
+#108 0.9934
+summary(model_clas_xgbTree$results)
+model_clas_xgbTree$results[108,'ROC']
+```
+##Comparativa de modelos
+```{r}
+model_list <- list(
+   glm = model_clas_glm, 
+#  glmnet = ___________________,
+#  glmnet_tunning = ___________________,
+   xgbTree = model_clas_xgbTree
+ )
+
+resamples <- resamples(model_list)
+
+summary(resamples, metric="ROC")
+
+bwplot(resamples, metric = "ROC") 
+# display univariate visualizations of the resampling distributions
+dotplot(resamples, metric="ROC")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
