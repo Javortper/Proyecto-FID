@@ -1,0 +1,108 @@
+
+## R Markdown
+
+Autores:
+José Enrique Sánchez López
+Javier Ortiz Pérez
+
+Dataset elegido:
+Satifacción de clientes de aerolineas.
+link: https://www.kaggle.com/teejmahal20/airline-passenger-satisfaction
+
+# Data visualization
+```{r}
+library(ggplot2)
+library(reshape)
+```
+
+
+## Data reading
+```{r}
+data <- read.csv('train.csv')
+colnames(data)[ncol(data)] <- "Satisfaction"
+head(data)
+```
+
+## Transforming ages to ranges
+```{r}
+#Ages  category:value -> 1:0-12, 2:13-30, 3:31-60, 4:61-inf
+data$Age[data$Age<=12] <- 1
+data$Age[data$Age>12 & data$Age<=30] <- 2 
+data$Age[data$Age>30 & data$Age<=60] <- 3 
+data$Age[data$Age>60] <- 4 
+```
+
+
+## Missing values and outliers
+```{r}
+na_count <-sapply(data, function(y) sum(length(which(is.na(y)))))
+print(na_count[na_count>0])
+#Arrival delay is the unique variable with missing values, specifically 310.  We are going to drop it.
+invalid_cols <- c(1, 2, 24) #Remove x and id columns.
+data <- data[, -invalid_cols]
+
+str(data)
+
+```
+
+## Data visualization
+```{r}
+#Balance check
+#Satisfaction balance
+sat_bal <- ggplot(data = data, aes(x=Satisfaction, fill=Satisfaction)) + 
+  geom_bar() + 
+  labs(x="Satisfaction balance") +
+  theme_minimal()+
+  guides(fill=FALSE)
+sat_bal
+#Gender balance
+gen_bal <-ggplot(data = data, aes(x=Gender, fill=Gender)) + 
+  geom_bar() + 
+  labs(x="Gender balance") +
+  theme_minimal()+
+  guides(fill=FALSE)
+gen_bal
+#Age balance
+#1:0-12, 2:13-30, 3:31-60, 4:61
+age_bal <-ggplot(data = data, aes(x=Age, fill=Age)) + 
+  geom_bar() + 
+  labs(x="Age") +
+  theme_minimal()
+age_bal
+##Satisfaction comparatives by variable
+#Satisfaction vs gender
+sat_gen <-ggplot(data = data, aes(x=Gender, fill=Satisfaction)) + 
+  geom_bar(position="dodge") + 
+  labs(x="Satisfaction vs gender") +
+  theme_minimal()
+sat_gen
+#Satisfaction vs customer type
+sat_customer <- ggplot(data = data, aes(x=Customer.Type, fill=Satisfaction)) + 
+  geom_bar(position="dodge") + 
+  labs(x="Satisfaction vs customer type") +
+  theme_minimal()+
+  guides()
+sat_customer
+#Satisfaction vs type of travel
+sat_traveltype <- ggplot(data = data, aes(x=Type.of.Travel, fill=Satisfaction)) + 
+  geom_bar(position="dodge") + 
+  labs(x="Satisfaction vs type of travel") +
+  theme_minimal()+
+  guides()
+sat_traveltype
+#Satisfaction vs Class
+sat_traveltype <- ggplot(data = data, aes(x=Class, fill=Satisfaction)) + 
+  geom_bar(position="dodge") + 
+  labs(x="Satisfaction vs Class") +
+  theme_minimal()+
+  guides()
+sat_traveltype
+#Satisfaction vs Age
+sat_traveltype <- ggplot(data = data, aes(x=Age, fill=Satisfaction)) + 
+  geom_bar(position="dodge") + 
+  labs(x="Satisfaction vs age") +
+  theme_minimal()+
+  guides()
+sat_traveltype
+```
+

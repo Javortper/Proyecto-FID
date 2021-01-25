@@ -21,31 +21,7 @@ data$Satisfaction[data$Satisfaction=='neutral or dissatisfied'] <- 'dissatisfied
 data$Satisfaction <- factor(data$Satisfaction)
 str(data)
 ```
-```{r}
 
-# Data Partition
-# 70% train, 30% test
-
-ind <- sample(2, nrow(data), replace = TRUE, prob = c(0.7, 0.3))
-
-train <- data[ind==1,]
-test <- data[ind==2,]
-
-
-
-
-tr_control <- trainControl(method='cv',
-                           number=5,
-                           classProbs = TRUE,
-                           verboseIter = TRUE,)
-
-set.seed(1)
-model <- train(Satisfaction ~ ., train,
-               method='rf', TuneLength=3,
-               trControl = tr_control)
-
-print(model)
-```
 ```{r}
 # Data Partition
 library(randomForest)
@@ -92,9 +68,9 @@ control <- trainControl(method="repeatedcv",
                         verboseIter = TRUE,
                         allowParallel = TRUE)
 
-tunegrid <- expand.grid(.mtry=c(1:15),.ntree=c(30, 60, 90))
+tunegrid <- expand.grid(.mtry=c(1:15),.ntree=c(10, 30, 60, 90))
 
-set.seed(123)
+set.seed(1)
 
 custom <- train(Satisfaction~., data=train, 
                 method=customRF, 
@@ -110,8 +86,45 @@ summary(custom)
 summary(custom)
 plot(custom)
 ```
+```{r}
+tunegrid <- expand.grid(.mtry=c(10),.ntree=c(60))
+
+set.seed(1)
+
+best_model <- train(Satisfaction~., data=train, 
+                method=customRF, 
+                metric=metric, 
+                tuneGrid=tunegrid, 
+                trControl=control)
+
+## Prediction & Confusion Matrix - test data
+predict_rf_model <- predict(best_model, test)
+confusionMatrix(predict_rf_model, as.factor(test$Satisfaction))
 
 
+```
+```{r}
+library(pROC)
+library(ROCit)
+library(broom)    # tidy()
+library(tibble)   # tibble()
+## Warning: package 'ROCit' was built under R version 3.5.2
+ROCit_obj <- rocit(score=as.numeric(predict_rf_model),class=as.numeric(test$Satisfaction))
+plot(ROCit_obj)
+
+myroc <- roc(as.numeric(predict_rf_model), as.numeric(test$Satisfaction))
+auc(myroc)
+
+
+```
+```{r}
+library(ROCit)
+## Warning: package 'ROCit' was built under R version 3.5.2
+ROCit_obj <- rocit(score=as.numeric(predict_rf_model),class=as.numeric(test$Satisfaction))
+plot(ROCit_obj)
+
+
+```
 
 ```{r}
 ## Prediction & Confusion Matrix - test data
@@ -139,6 +152,38 @@ plot(ROCit_obj)
 
 
 ```
+
+
+```{r}
+
+# Data Partition
+# 70% train, 30% test
+
+ind <- sample(2, nrow(data), replace = TRUE, prob = c(0.7, 0.3))
+
+train <- data[ind==1,]
+test <- data[ind==2,]
+
+
+
+
+tr_control <- trainControl(method='cv',
+                           number=5,
+                           classProbs = TRUE,
+                           verboseIter = TRUE,
+                           ntree=60)
+
+set.seed(1)
+model <- train(Satisfaction ~ ., train,
+               method='rf', TuneLength=3,
+               trControl = tr_control)
+
+print(model)
+
+```
+
+
+
 
 
 
