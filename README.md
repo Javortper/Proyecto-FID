@@ -1,3 +1,6 @@
 # Proyecto-FID
+Master en Ingeniería del Software: Cloud, Datos y Gestión TI
+Universidad de Sevilla
 
-Aquí explicamos que orden hay que seguir y donde esta cada cosa para cuando corrija la profesora
+Javier Ortiz 
+José Enrique Sánchez
