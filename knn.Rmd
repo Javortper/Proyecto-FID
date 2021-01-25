@@ -1,0 +1,79 @@
+```{r}
+library(ISLR)
+library(caret)
+```
+
+
+## Data reading
+```{r}
+data <- read.csv('train.csv')
+invalid_cols = c(1, 2) #TODO: ELEGIR COLUMNAS QUE NO USAREMOS, de momento 1 y 2
+data <- data[, -invalid_cols]
+colnames(data)[ncol(data)] <- "Satisfaction"
+head(data)
+
+```
+```{r}
+anyNA(data)
+summary(data)
+```
+
+
+```{r}
+set.seed(300)
+#Spliting data as training and test set. Using createDataPartition() function from caret
+indxTrain <- createDataPartition(y = data$Satisfaction,p = 0.50,list = FALSE)
+training <- data[indxTrain,]
+testing <- data[-indxTrain,]
+
+#Checking distibution in origanl data and partitioned data
+prop.table(table(training$Satisfaction)) * 100
+```
+```{r}
+#kNN requires variables to be normalized or scaled. caret provides facility to preprocess data. I am going to choose centring and scaling
+
+
+trainX <- training[, names(training) != "Satisfaction"]
+preProcValues <- preProcess(x = trainX,method = c("center", "scale"))
+preProcValues
+```
+
+
+```{r}
+#Training and train control
+set.seed(400)
+ctrl <- trainControl(method="repeatedcv",repeats = 3) #,classProbs=TRUE,summaryFunction = twoClassSummary)
+knnFit <- train(Satisfaction ~ ., data = training, method = "knn", trControl = ctrl, preProcess = c("center","scale"), tuneLength = 20, na.action=na.exclude)
+
+#Output of kNN fit
+knnFit
+```
+
+
+```{r}
+#Plotting yields Number of Neighbours Vs accuracy (based on repeated cross validation)
+plot(knnFit)
+```
+
+
+```{r}
+test_pred <- predict(knnFit, newdata = testing)
+print(test_pred)
+
+#Get the confusion matrix to see accuracy value and other parameter values
+#confusionMatrix(test_pred, testing$Satisfaction )
+```
+
+
+```{r}
+preds <- table(test_pred)
+value <- table(testing$Satisfaction)
+print(preds)
+print(value)
+
+```
+
+
+
+
+
