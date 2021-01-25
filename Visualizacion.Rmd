@@ -41,7 +41,6 @@ print(na_count[na_count>0])
 invalid_cols <- c(1, 2, 24) #Remove x and id columns.
 data <- data[, -invalid_cols]
 
-str(data)
 
 ```
 
@@ -105,4 +104,32 @@ sat_traveltype <- ggplot(data = data, aes(x=Age, fill=Satisfaction)) +
   guides()
 sat_traveltype
 ```
+
+
+#Correlation matrix
+```{r}
+data$Gender <- as.numeric(factor(data$Gender, levels = c('Male','Female')))
+data$Customer.Type <- as.numeric(factor(data$Customer.Type, levels = c('Loyal Customer','disloyal Customer')))
+data$Type.of.Travel <- as.numeric(factor(data$Type.of.Travel, levels = c('Business travel','Personal Travel')))
+data$Class <- as.numeric(factor(data$Class, levels = c('Business', 'Eco', 'Eco Plus')))
+data$Satisfaction <- as.numeric(factor(data$Satisfaction))
+
+
+```
+
+
+
+```{r}
+res <- cor(data)
+round(res, 2)
+library(corrplot)
+png(height=1200, width=1500, pointsize=15, file="overlap.png")
+corrplot(res, , order = "hclust", 
+         tl.col = "black", tl.srt = 45, number.cex=1)
+
+
+```
+
+
+
 
